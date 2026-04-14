@@ -22,13 +22,16 @@ usage() {
     echo "  COMIC                 Comic # (e.g. xkcd.sh 927)"
 }
 
-options=$(getopt -o tash --name xkcd.sh --long transcript:,help -- "$@")
+
+options=$(getopt -o trh --name xkcd.sh --long transcript,random,help -- "$@")
 eval set -- "$options"
 
 while true; do
     case "$1" in
         -t|--transcript)
             SHOW_TRANSCRIPT=true; shift ;;
+        -r|--random)
+            RANDOM_COMIC=true; shift ;;
         -h|--help)
             usage; exit 0 ;;
         --) shift; break ;;
@@ -41,9 +44,22 @@ get_comic () {
     echo "$(curl https://xkcd.com/"$1"/info.0.json 2>/dev/null | jq '.')"
 }
 
-CID="${1:-}"
-echo "Loading comic ${CID}..."
+random_comic() {
+    LC="$(curl https://xkcd.com/"$1"/info.0.json 2>/dev/null | jq '.num')"
+    echo "$(shuf -i 1-${LC} -n 1)"
+}
 
+CID="${1:-}"
+
+if [[ $RANDOM_COMIC == true ]] then
+    CID=$(random_comic)
+fi
+
+if [[ $CID == "" ]] then
+    echo "Loading latest comic..."
+else
+    echo "Loading comic ${CID}..."
+fi
 
 COMIC_TMP=$(mktemp --directory)
 COMIC=$(get_comic "$CID")
