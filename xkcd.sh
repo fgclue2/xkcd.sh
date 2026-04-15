@@ -16,6 +16,7 @@ usage() {
     echo ""
     echo "Options:"
     echo "  -t, --transcript      Show transcript"
+    echo "  -r, --random          Choose a random comic"
     echo "  -h, --help            Show this help message"
     echo ""
     echo "Arguments:"
