@@ -67,8 +67,8 @@ IMAGE=$(echo "${COMIC}" | jq -r '.img')
 if [[ -v OUTPUT ]] then
     curl "$IMAGE" -o "$OUTPUT" 2>/dev/null
 else
-    OUTPUT="$CID"
-    curl "$IMAGE" -o "$OUTPUT.png" 2>/dev/null
+    OUTPUT="$CID.png"
+    curl "$IMAGE" -o "$OUTPUT" 2>/dev/null
 fi
 
 echo -e "\033[1A\033[2K"
@@ -88,6 +88,9 @@ TRANSCRIPT=$(echo "${COMIC}" | jq -r '.transcript')
 
 echo -e "\033[1A#${NUMBER}: $TITLE"
 echo "published $DATE"
+echo
+
+kitten icat $OUTPUT
 
 echo
 echo "Saved to $OUTPUT"
