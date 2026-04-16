@@ -1,10 +1,10 @@
 # xkcd.sh
 
-> xkcd reader in bash shell script using icat and curl
+> xkcd reader in bash shell script using icat (or chafa) and curl
 
 ![Image of xkcd.sh program, shows a comic and some alt text](xkcd.png)
 
-xkcd.sh is a very simple xkcd reader that uses `icat` and `curl` to get an xkcd comic and show it in the terminal. It uses `icat` to show the images and `curl` to get the comic.
+xkcd.sh is a very simple xkcd reader that uses `icat` (or `chafa`) and `curl` to get an xkcd comic and show it in the terminal. It uses `icat` to show the images and `curl` to get the comic.
 
 ## Usage
 

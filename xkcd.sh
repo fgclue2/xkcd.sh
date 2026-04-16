@@ -7,7 +7,12 @@ cmd_exists() {
     fi
 }
 
-cmd_exists kitten || exit 1
+quietcmdexists() {
+    if ! which "$1" >/dev/null 2>/dev/null; then
+        return 1
+    fi
+}
+
 cmd_exists curl || exit 1
 cmd_exists getopt || exit 1
 
@@ -92,9 +97,47 @@ echo "published $DATE"
 
 echo
 
-kitten icat --align left --background=white "$COMIC_TMP"/padded.png
+# COMIC RENDERING STARTS HERE
+#FROM https://sw.kovidgoyal.net/kitty/graphics-protocol/#a-minimal-example
+send_chunked() {
+    first="y"
+    while IFS= read -r chunk; do
+        metadata=""; [ "$first" = "y" ] && { metadata="a=T,f=100,"; first="n"; }
+        printf "\033_G%sm=1;%s\033\\" "${metadata}" "${chunk}"
+    done
+    [ "$first" = "n" ] && { printf "\033_Gm=0;\033\\"; return 0; }
+    return 1
+}
+# also from https://sw.kovidgoyal.net/kitty/graphics-protocol/#a-minimal-example
+transmit_png() {
+    # Different systems have different or missing base64 executables.
+    # The sed command below adds a trailing newline which openssl
+    # base64 does not produce and is needed for reading via read -r
+    { command base64 -w 4096 "$1" 2>/dev/null | send_chunked; } || \
+    { command base64 -b 4096 "$1" 2>/dev/null | send_chunked; } || \
+    { command openssl base64 -e -A -in "$1" | command sed '$a\' | command fold -b -w 4096 | send_chunked; }
+}
 
+quietcmdexists kitten
+HAS_KITTEN="$?"
+quietcmdexists chafa
+HAS_CHAFA="$?"
+
+# checking for kitty terminal protocol
+icat || HAS_KITTEN=1
+
+if [[ $HAS_KITTEN == 0 ]] then
+    kitten icat --align left --background=white "$COMIC_TMP"/padded.png
+elif [[ $HAS_CHAFA == 0 ]] then
+    chafa "$COMIC_TMP"/padded.png
+else
+    transmit_png "$COMIC_TMP"/padded.png
+    echo
+fi
+
+echo
 echo "$ALT"
+# ENDS HERE
 if [[ $SHOW_TRANSCRIPT == true ]]; then
     echo
     echo "${TRANSCRIPT}"
