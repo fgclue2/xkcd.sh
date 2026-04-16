@@ -7,6 +7,12 @@ cmd_exists() {
     fi
 }
 
+quietcmdexists() {
+    if ! which "$1" >/dev/null 2>/dev/null; then
+        return 1
+    fi
+}
+
 cmd_exists curl || exit 1
 cmd_exists getopt || exit 1
 
