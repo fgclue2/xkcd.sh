@@ -124,7 +124,7 @@ quietcmdexists chafa
 HAS_CHAFA="$?"
 
 # checking for kitty terminal protocol
-kitten icat || HAS_KITTEN=1
+kitten icat 2>/dev/null || HAS_KITTEN=1
 
 if [[ $HAS_KITTEN == 0 ]] then
     kitten icat --align left --background=white "$COMIC_TMP"/padded.png
